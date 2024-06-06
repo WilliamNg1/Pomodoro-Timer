@@ -17,12 +17,6 @@ const settingsParamSchema = z.object({
   personId: z.string(),
 });
 
-const settingBodySchema = z.object({
-  pomodoro_duration: z.number().int(),
-  short_break_duration: z.number().int(),
-  long_break_duration: z.number().int(),
-});
-
 const updateSessionStatusParamSchema = z.object({
   taskId: z.string(),
   sessionId: z.string(),
@@ -37,6 +31,7 @@ const updateSettingBodySchema = z
     pomodoro_duration: z.number().int(),
     short_break_duration: z.number().int(),
     long_break_duration: z.number().int(),
+    long_break_interval: z.number().int(),
   })
   .partial();
 
@@ -44,8 +39,8 @@ export const startSession = async (req: Request, res: Response) => {
   console.log(req.params);
   const { taskId } = requestParamSchema.parse(req.params);
   try {
-    await updateSessionStatusToInProgress(taskId);
-    res.status(200).send("Timer started");
+    const result = await updateSessionStatusToInProgress(taskId);
+    res.status(200).send(`Timer started, session_id: ${result}`);
   } catch (e: any) {
     console.log("e", e);
     if (e.message === "Current status is still in progress") {
@@ -101,7 +96,7 @@ export const createSettings = async (req: Request, res: Response) => {
 
   const { personId } = settingsParamSchema.parse(req.params);
 
-  const reqBody = settingBodySchema.parse(req.body);
+  const reqBody = updateSettingBodySchema.parse(req.body);
   try {
     await createSettingData(personId, reqBody);
     res.status(200).send("success!");

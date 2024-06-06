@@ -1,9 +1,3 @@
-export interface CreateSetting {
-  pomodoro_duration: number;
-  short_break_duration: number;
-  long_break_duration: number;
-}
-
 export interface Setting {
   id?: string;
   pomodoro_duration: number;
@@ -16,4 +10,5 @@ export interface UpdateSetting {
   pomodoro_duration?: number;
   short_break_duration?: number;
   long_break_duration?: number;
+  long_break_interval?: number;
 }

@@ -1,9 +1,5 @@
 import pool from "../db";
-import {
-  CreateSetting,
-  Setting,
-  UpdateSetting,
-} from "../interfaces/session.interface";
+import { Setting, UpdateSetting } from "../interfaces/session.interface";
 import { scheduleJob, scheduledJobs } from "node-schedule";
 import {
   getSessionDuration,
@@ -66,7 +62,7 @@ export const updateSessionStatusToInProgress = async (taskId: string) => {
       });
     }
   );
-  return result;
+  return session_id;
 };
 
 export const updateSessionStatusToPause = async (
@@ -199,14 +195,22 @@ export const getStatus = async (taskId: string) => {
 
 export const createSettingData = async (
   personId: string,
-  reqBody: CreateSetting
+  reqBody: UpdateSetting
 ) => {
-  const { pomodoro_duration, short_break_duration, long_break_duration } =
-    reqBody;
+  const {
+    pomodoro_duration,
+    short_break_duration,
+    long_break_duration,
+    long_break_interval,
+  } = reqBody;
 
   const psqlServer = await pool.connect();
   const result = await psqlServer.query(
-    `INSERT INTO setting(pomodoro_duration, short_break_duration, long_break_duration, person_id) VALUES (${pomodoro_duration}, ${short_break_duration},  ${long_break_duration}, ${personId})`
+    `INSERT INTO setting(pomodoro_duration, short_break_duration, long_break_duration, person_id, long_break_interval) VALUES (${
+      pomodoro_duration ?? 5
+    }, ${short_break_duration ?? 5},  ${
+      long_break_duration ?? 5
+    }, ${personId}, ${long_break_interval ?? 2})`
   );
   psqlServer.release();
   return result;
